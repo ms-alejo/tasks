@@ -1,11 +1,14 @@
 /*
-Copyright © 2024 NAME HERE <EMAIL ADDRESS>
-
+Copyright © 2024 Miguel Alejo
 */
 package cmd
 
 import (
+	"encoding/csv"
 	"fmt"
+	"io"
+	"os"
+	"strconv"
 
 	"github.com/spf13/cobra"
 )
@@ -13,15 +16,12 @@ import (
 // deleteCmd represents the delete command
 var deleteCmd = &cobra.Command{
 	Use:   "delete",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Delete a task",
+	Long:  `Delete a specific task by providing its ID.`,
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("delete called")
+		taskID, _ := strconv.Atoi(args[0])
+		deleteTask(taskID)
 	},
 }
 
@@ -37,4 +37,40 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// deleteCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func deleteTask(taskID int) {
+	file, err := loadFile("tasks.csv")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Error loading file:", err)
+		return
+	}
+	defer closeFile(file)
+
+	reader := csv.NewReader(file)
+	records, _ := reader.ReadAll()
+
+	// filter
+	newRecords := [][]string{}
+	found := false
+	for _, record := range records {
+		id, _ := strconv.Atoi(record[0])
+		if id != taskID {
+			newRecords = append(newRecords, record)
+		} else {
+			found = true
+		}
+	}
+
+	if !found {
+		fmt.Fprintln(os.Stderr, "Task not found.")
+		return
+	}
+
+	file.Truncate(0)
+	file.Seek(0, io.SeekStart)
+	writer := csv.NewWriter(file)
+	writer.WriteAll(newRecords)
+	writer.Flush()
+	fmt.Println("Task deleted successfully!")
 }
