@@ -58,7 +58,7 @@ func listTasks(showAll bool) {
 	}
 
 	// tabular output
-	writer := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.AlignRight)
+	writer := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	if showAll {
 		fmt.Fprintln(writer, "ID\tTask\tCreated\tDone")
 	} else {
