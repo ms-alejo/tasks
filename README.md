@@ -1,6 +1,5 @@
 # **Task Manager CLI**
 
-![Go Version](https://img.shields.io/github/go-mod/go-version/github/ms-alejo/tasks)  
 A simple and intuitive Command-Line Interface (CLI) for managing tasks efficiently, built using the [Cobra](https://github.com/spf13/cobra) library in Go. This tool allows you to add, list, complete, and delete tasks from the terminal.
 
 ---
